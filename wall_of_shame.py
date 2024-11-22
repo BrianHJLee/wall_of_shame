@@ -61,7 +61,7 @@ while True:
     if league_id is None:
         break
 
-    current_week = 19
+    current_week = 18
     current_year -= 1
 
 all_matchups = all_matchups.sort_values(by='score', ascending=True)
