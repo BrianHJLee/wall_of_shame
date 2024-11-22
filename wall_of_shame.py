@@ -66,4 +66,4 @@ while True:
 
 all_matchups = all_matchups.sort_values(by='score', ascending=True)
 
-print(all_matchups.head(10))
+print(all_matchups.head(10).to_string(index=False))
