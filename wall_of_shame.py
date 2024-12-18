@@ -44,14 +44,31 @@ while True:
         response = requests.get(f"https://api.sleeper.app/v1/league/{league_id}/matchups/{week}")
         body = response.json()
 
+        unpaired_matchups = {}
+
         for matchup in body:
-            all_matchups = pd.concat([all_matchups, pd.DataFrame([{
-                'season': current_year,
-                'week': week,
-                'user_name': owner_id_to_name[roster_id_to_owner[matchup['roster_id']]],
-                'team_name': onwer_id_to_team[roster_id_to_owner[matchup['roster_id']]],
-                'score': matchup['points']
-            }])], ignore_index=True)
+            if matchup['matchup_id'] in unpaired_matchups:
+                all_matchups = pd.concat([all_matchups, unpaired_matchups[matchup['matchup_id']]], ignore_index=True)
+                unpaired_matchups.pop(matchup['matchup_id'])
+
+                all_matchups = pd.concat([all_matchups, pd.DataFrame([{
+                    'season': current_year,
+                    'week': week,
+                    'user_name': owner_id_to_name[roster_id_to_owner[matchup['roster_id']]],
+                    'team_name': onwer_id_to_team[roster_id_to_owner[matchup['roster_id']]],
+                    'score': matchup['points']
+                }])], ignore_index=True)
+            elif matchup['matchup_id'] is None:
+                # this skips bye weeks, non-matched playoff weeks, etc.
+                continue
+            else:
+                unpaired_matchups[matchup['matchup_id']] = pd.DataFrame([{
+                    'season': current_year,
+                    'week': week,
+                    'user_name': owner_id_to_name[roster_id_to_owner[matchup['roster_id']]],
+                    'team_name': onwer_id_to_team[roster_id_to_owner[matchup['roster_id']]],
+                    'score': matchup['points']
+                }])
 
     response = requests.get(f"https://api.sleeper.app/v1/league/{league_id}")
     body = response.json()
