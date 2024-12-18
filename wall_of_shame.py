@@ -66,4 +66,10 @@ while True:
 
 all_matchups = all_matchups.sort_values(by='score', ascending=True)
 
+# label top 10
+all_matchups['rank'] = all_matchups['score'].rank(method='min', ascending=True)
+
+# move rank to front
+all_matchups = all_matchups[['rank', 'season', 'week', 'user_name', 'team_name', 'score']]
+
 print(all_matchups.head(10).to_markdown(index=False))
